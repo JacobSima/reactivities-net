@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Core;
 using AutoMapper;
 using Domain;
+using FluentValidation;
 using MediatR;
 using Persistence;
 
@@ -12,34 +14,46 @@ namespace Application.Activities
 {
     public class Edit
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result<Unit>>
         {
             public Activity Activity {get; set;}
         }
 
-    public class Handler : IRequestHandler<Command>
-    {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
-        public Handler(DataContext context, IMapper mapper)
+        // Middleware for Validation
+        public class CommandValidator : AbstractValidator<Command>
         {
-            _context = context;
-            _mapper = mapper;
+            public CommandValidator()
+            {
+                RuleFor(x => x.Activity).SetValidator(new ActivityValidator());
+            }
         }
 
-      public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
-            var activity = await _context.Activities.FindAsync(request.Activity.Id);
+            private readonly DataContext _context;
+            private readonly IMapper _mapper;
+            public Handler(DataContext context, IMapper mapper)
+            {
+                _context = context;
+                _mapper = mapper;
+            }
 
-            // We gonna use Auto Maper to map the edit at once instead of doing this way for each field
-            // activity.Title = request.Activity.Title ?? activity.Title;
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            {
+                var activity = await _context.Activities.FindAsync(request.Activity.Id);
 
-            _mapper.Map(request.Activity, activity);
+                if(activity == null) return null;
 
-            await _context.SaveChangesAsync();
+                // We gonna use Auto Maper to map the edit at once instead of doing this way for each field
+                // activity.Title = request.Activity.Title ?? activity.Title;
+                _mapper.Map(request.Activity, activity);
 
-            return Unit.Value;
+                var result = await _context.SaveChangesAsync() > 0;
+
+                if(!result) return Result<Unit>.Failure("Failed to update activity");
+
+                return Result<Unit>.Success(Unit.Value);
+            }
         }
-    }
   }
 }
