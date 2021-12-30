@@ -48,6 +48,7 @@ class ActivityStore {
 
   // Load Activities Action
   loadActivities = async () => {
+    this.setLoadingInitial(true); 
     try {
       const activities = await agent.Activities.list();
       activities.forEach(activity => {
