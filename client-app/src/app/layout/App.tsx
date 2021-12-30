@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {Container} from 'semantic-ui-react';
 import NavBar from './NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
@@ -11,15 +11,35 @@ import TestErrors from '../../features/errors/TestError';
 import { ToastContainer } from 'react-toastify';
 import NotFound from '../../features/errors/NotFound';
 import ServerError from '../../features/errors/ServerError';
+import LoginForm from '../../features/users/LoginForm';
+import { useStore } from '../stores/store';
+import Loading from './Loading';
+import ModalContainer from '../common/modals/ModalContainer'
 
 
 const App  = () =>{
 
   const location = useLocation();
+  const {commonStore, userStore} = useStore();
+
+  // Use this logic to check if there is a token in local storage
+  // which means, the user is still logged in, then get the current logged user
+  // But token need to be sent in the request in order to get the current logged user
+  // Then we can persist the current logged user even when refresh a page.
+  useEffect(() =>{
+    if(commonStore.token){
+      userStore.getUser().finally(() => commonStore.setAppLoaded());
+    }else{
+      commonStore.setAppLoaded();
+    }
+  },[commonStore, userStore])
+
+  if(!commonStore.setAppLoaded) return <Loading  content='Loading App...'/>
 
   return (
     <>
       <ToastContainer position='bottom-right' hideProgressBar />
+      <ModalContainer />
       <Route exact path='/' component={HomePage} />
       <Route    
         path={'/(.+)'}
@@ -33,6 +53,8 @@ const App  = () =>{
                   <Route key={location.key} path={['/createActivity', '/manage/:id']} component={ActivityForm} />
                   <Route path='/errors' component={TestErrors}/>
                   <Route path='/server-error' component={ServerError}/>
+
+                  <Route path='/login' component={LoginForm}/>
 
                   
                   <Route component={NotFound} />
