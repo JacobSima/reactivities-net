@@ -42,3 +42,8 @@ body {
 }
 
 /*end home page styles*/
+
+
+.react-datepicker-wrapper {
+  width: 100%;
+}
