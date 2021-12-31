@@ -11,6 +11,8 @@ using Microsoft.OpenApi.Models;
 using Persistence;
 using Application.Activities;
 using Application.Core;
+using Application.Interfaces;
+using Infrastructure.Security;
 
 namespace API.Extensions
 {
@@ -47,6 +49,10 @@ namespace API.Extensions
 
             // Add AutoMapper as Service
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
+            // Add IUserAccessor and  UserAccessor from application and infrastructure project 
+            // respectively as a service
+            services.AddScoped<IUserAccessor, UserAccessor>();
 
             return services;
 
