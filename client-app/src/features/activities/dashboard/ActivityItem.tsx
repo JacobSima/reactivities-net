@@ -1,8 +1,10 @@
 import { format } from 'date-fns'
+import { observer } from 'mobx-react-lite'
 import React  from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Icon, Item, Segment } from 'semantic-ui-react'
+import { Button, Icon, Item, Label, Segment } from 'semantic-ui-react'
 import { Activity } from '../../../app/models/activity'
+import ActivityAttendeeList from './ActivityAttendeeList'
 
 
 interface Props {
@@ -15,16 +17,29 @@ const ActivityItem = ({activity}: Props) => {
   return (
     <Segment.Group>
         <Segment>
+          {activity.isCancelled && (
+            <Label attached='top' color='red' content='Cancel' style={{textAlign:'center'}} />
+          )}
           <Item.Group>
             <Item>
-              <Item.Image size='tiny' circular scr='/assets/user.png' />
+              <Item.Image style={{marginBottom:3}} size='tiny' circular scr='/assets/user.png' />
               <Item.Content>
                   <Item.Header 
                     as={Link} 
                     to={`/activities/${activity.id}`} >
                       {activity.title}
                   </Item.Header>
-                  <Item.Description>Hosted By Bob</Item.Description>
+                  <Item.Description>Hosted By {activity.host?.displayName}</Item.Description>
+                  {activity.isHost && (
+                    <Item.Description>
+                      <Label basic color='orange' >You are hosting this activity</Label>
+                    </Item.Description>
+                  )}
+                  {activity.isGoing && !activity.isHost && (
+                    <Item.Description>
+                      <Label basic color='green' >You are going to this activity</Label>
+                    </Item.Description>
+                  )}
               </Item.Content>
             </Item>
           </Item.Group>
@@ -38,7 +53,7 @@ const ActivityItem = ({activity}: Props) => {
         </Segment>
 
         <Segment secondary>
-            Attendees go here
+            <ActivityAttendeeList  attendees={activity.attendees!} />
         </Segment>
 
         <Segment clearing>
@@ -55,4 +70,4 @@ const ActivityItem = ({activity}: Props) => {
   )
 }
 
-export default ActivityItem
+export default observer(ActivityItem) 
