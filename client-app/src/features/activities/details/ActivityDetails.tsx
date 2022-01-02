@@ -15,12 +15,15 @@ const ActivityDetails = () => {
   
   const {activityStore}  = useStore();
   const {id} = useParams<{id: string}>();
-  const {selectedActivity: activity, loadActivity, loadingInitial} = activityStore;
+  const {selectedActivity: activity, loadActivity, loadingInitial, clearSelectedActivity} = activityStore;
 
   useEffect(() => {
     if(id) loadActivity(id);
 
-  },[id, loadActivity])
+    // As you close or change the selected activity must be cleared in the memory
+    return () => clearSelectedActivity();
+
+  },[id, loadActivity, clearSelectedActivity])
   
   if(loadingInitial) return <Loading  content='Loading activity'/>;
   if(!activity) return <></>;
@@ -30,7 +33,7 @@ const ActivityDetails = () => {
       <Grid.Column width={10}>
           <DetailHeader activity={activity} />
           <DetailInfo  activity={activity}/>
-          <DetailChat />
+          <DetailChat activityId={activity.id}/>
       </Grid.Column>
       <Grid.Column width={6} >
           <DetailSideBar activity={activity}/>

@@ -17,12 +17,19 @@ namespace Persistence
 
     public DbSet<Activity> Activities {get; set;}
 
+    public DbSet<ActivityAttendee> ActivityAttendees {get; set;}
+
+    // DB Set for the Photos in Case with want to query the phot link
+    public DbSet<Photo> Photos {get; set;} 
+
+    // Add Comment in DB
+    public DbSet<Comment> Comments {get; set;}
+
+
     // Configuration for Many-to-Many relations between
     // Activity-AppUser 
     // Activity : ICollection<ActivityAttendee> Attendees
     // AppUser  : ICollection<ActivityAttendee> Activities
-    public DbSet<ActivityAttendee> ActivityAttendees {get; set;}
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
       base.OnModelCreating(builder);
@@ -39,9 +46,15 @@ namespace Persistence
         .WithMany(a => a.Attendees)
         .HasForeignKey(aa => aa.ActivityId);
 
+      // add the Cascade deleting, if Activity deleted then delete all comment related 
+      // to the activity
+      builder.Entity<Comment>()
+        .HasOne(a => a.Activity)
+        .WithMany(c => c.Comments)
+        .OnDelete(DeleteBehavior.Cascade);
+
     }
 
-    // DB Set for the Photos in Case with want to query the phot link
-    public DbSet<Photo> Photos {get; set;} 
+    
   }
 }

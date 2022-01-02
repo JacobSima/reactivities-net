@@ -182,6 +182,10 @@ class ActivityStore {
     catch (error) {console.log(error)}
     finally{this.setLoading(false)};
   }
+
+  clearSelectedActivity = () => {
+    this.selectedActivity = undefined;
+  }
   
 
 }

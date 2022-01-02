@@ -41,8 +41,10 @@ namespace API.Extensions
                     policy
                         .AllowAnyMethod()
                         .AllowAnyHeader()
+                        .AllowCredentials() // was add to allow signalIR from client side
                         .WithOrigins("http://localhost:3000");
                 });
+                
             });
 
             // Add MediatR
@@ -62,6 +64,9 @@ namespace API.Extensions
             // Add the cloudinary configuration from appsettings as a service
             // CloudinarySettings from infrastructure
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+
+            // Add Signal R as a service
+            services.AddSignalR();
 
             return services;
 
