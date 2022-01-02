@@ -16,7 +16,6 @@ const ActivityList = () => {
           <Header sub color='teal'>
               {group}
           </Header>
-
           {activities.map(activity =>(
             <ActivityItem  activity={activity} key={activity.id}/>
           ))}
