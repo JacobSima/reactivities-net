@@ -12,7 +12,11 @@ namespace Domain
 
         public string Bio {get; set;}
 
-        public ICollection<ActivityAttendee> Activities {get; set;}
+        // Many to Many Relationship with Activities Via ActivityAttendee Middle Table
+        public ICollection<ActivityAttendee> Activities {get; set;}   
+
+        // One to Many Relationship with the Photo entity
+        public ICollection<Photo> Photos {get; set;}
 
         
     }

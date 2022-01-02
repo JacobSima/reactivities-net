@@ -40,5 +40,8 @@ namespace Persistence
         .HasForeignKey(aa => aa.ActivityId);
 
     }
+
+    // DB Set for the Photos in Case with want to query the phot link
+    public DbSet<Photo> Photos {get; set;} 
   }
 }

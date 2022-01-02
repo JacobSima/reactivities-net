@@ -13,6 +13,7 @@ using Application.Activities;
 using Application.Core;
 using Application.Interfaces;
 using Infrastructure.Security;
+using Infrastructure.Photos;
 
 namespace API.Extensions
 {
@@ -53,6 +54,14 @@ namespace API.Extensions
             // Add IUserAccessor and  UserAccessor from application and infrastructure project 
             // respectively as a service
             services.AddScoped<IUserAccessor, UserAccessor>();
+
+            // Add IPhotoAccessor and PhotoAccessor from application and infrastructure project
+             // respectively as a service 
+            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+
+            // Add the cloudinary configuration from appsettings as a service
+            // CloudinarySettings from infrastructure
+            services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
 
             return services;
 
