@@ -16,9 +16,12 @@ namespace Application.Activities
 {
   public class List
   {
-      public class Query : IRequest<Result<List<ActivityDto>>>{};
+      public class Query : IRequest<Result<PageList<ActivityDto>>>
+      {
+        public PagingParams Params {get; set;}
+      };
 
-      public class Handler : IRequestHandler<Query, Result<List<ActivityDto>>>
+      public class Handler : IRequestHandler<Query, Result<PageList<ActivityDto>>>
       {
           private readonly DataContext _context;
           private readonly IMapper _mapper;
@@ -30,19 +33,27 @@ namespace Application.Activities
               _context = context;
           }
 
-          public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
+          public async Task<Result<PageList<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
           {
-            var Activities = await _context.Activities
+            var query =  _context.Activities
                               // .Include(a => a.Attendees)
                               // .ThenInclude(u => u.AppUser)
+                              .OrderBy(d => d.Date)
                               .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider,
-                              new{currentUsername = _userAccessor.GetUsername()})
-                              .ToListAsync(cancellationToken);
+                                  new{currentUsername = _userAccessor.GetUsername()})
+                              .AsQueryable();
+                               // .ToListAsync(cancellationToken);
             
             // var activitiesToReturn = _mapper.Map<List<ActivityDto>>(Activities);
             // return Result<List<ActivityDto>>.Success(activitiesToReturn);
             
-            return Result<List<ActivityDto>>.Success(Activities);
+            return Result<PageList<ActivityDto>>.Success(
+              await PageList<ActivityDto>.CreateAsync(
+                query,   // source IQuaryable 
+                request.Params.PageNumber,
+                request.Params.PageSize
+              )
+            );
           }
       }
   }
