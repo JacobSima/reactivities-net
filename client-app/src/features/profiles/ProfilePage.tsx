@@ -11,11 +11,16 @@ const ProfilePage = () => {
 
   const {username} = useParams<{username: string}>();
   const {profileStore} = useStore();
-  const {loadProfile, profile, loadingProfile} = profileStore;
+  const {loadProfile, profile, loadingProfile, setActiveTab} = profileStore;
 
   useEffect(() =>{
     loadProfile(username)
-  }, [loadProfile, username])
+    
+    // clean up function, use when this component is dispose
+    return () => {
+      setActiveTab(0);
+    }
+  }, [loadProfile, username,setActiveTab])
 
   if(loadingProfile) return <Loading content='Loading profile...' />
 
