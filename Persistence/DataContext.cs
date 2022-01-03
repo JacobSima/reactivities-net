@@ -25,6 +25,10 @@ namespace Persistence
     // Add Comment in DB
     public DbSet<Comment> Comments {get; set;}
 
+    // Add DB set for Userfollowings
+    // and will add the configurations as well
+    public DbSet<UserFollowing> UserFollowings {get; set;}
+
 
     // Configuration for Many-to-Many relations between
     // Activity-AppUser 
@@ -52,6 +56,24 @@ namespace Persistence
         .HasOne(a => a.Activity)
         .WithMany(c => c.Comments)
         .OnDelete(DeleteBehavior.Cascade);
+
+      // Configuration for UserFollowing
+      // Using the builder action
+      builder.Entity<UserFollowing>(b => 
+      {
+        b.HasKey(k => new {k.ObserverId, k.TargetId});
+
+        b.HasOne(o => o.Observer)
+            .WithMany(f => f.Followings)
+            .HasForeignKey(o => o.ObserverId)
+            .OnDelete(DeleteBehavior.Cascade); // delete userFollowing if user deleted
+
+
+        b.HasOne(o => o.Target)
+            .WithMany(f => f.Followers)
+            .HasForeignKey(o => o.TargetId)
+            .OnDelete(DeleteBehavior.Cascade); // delete userFollower if user deleted
+      });
 
     }
 

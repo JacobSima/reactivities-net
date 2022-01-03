@@ -18,6 +18,11 @@ namespace Domain
         // One to Many Relationship with the Photo entity
         public ICollection<Photo> Photos {get; set;}
 
+        // Add the Following relationship
+        public ICollection<UserFollowing> Followings {get; set;}
+
+        public ICollection<UserFollowing> Followers {get; set;}
+
         
     }
 }
