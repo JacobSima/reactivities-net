@@ -76,6 +76,13 @@ namespace API
 
             app.UseRouting();
 
+            // Add support for serving Static files
+            // Default behavior: it s gonna look for index file in wwwroot folder
+            app.UseDefaultFiles();
+
+            // Default behavior: it s gonna look for static folder in wwwroot folder
+            app.UseStaticFiles();
+
             app.UseCors("CorsPolicy");
 
             app.UseAuthentication();   // Service added after the sign in of JWT code 
@@ -86,6 +93,7 @@ namespace API
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapFallbackToController("Index", "Fallback");
             });
         }
     }

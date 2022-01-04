@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Persistence;
 using Application.Activities;
 using Application.Core;
 using Application.Interfaces;
 using Infrastructure.Security;
 using Infrastructure.Photos;
+using Persistence;
 
 namespace API.Extensions
 {
@@ -30,7 +30,8 @@ namespace API.Extensions
              // Add Data Context as a Service
             services.AddDbContext<DataContext>(opt => 
             {
-                opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
+                // opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
+                opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
             });
 
             // Add CORS policy
