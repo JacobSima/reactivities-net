@@ -18,7 +18,7 @@ namespace Application.Activities
   {
       public class Query : IRequest<Result<PageList<ActivityDto>>>
       {
-        public PagingParams Params {get; set;}
+        public ActivityParams Params {get; set;}
       };
 
       public class Handler : IRequestHandler<Query, Result<PageList<ActivityDto>>>
@@ -38,11 +38,26 @@ namespace Application.Activities
             var query =  _context.Activities
                               // .Include(a => a.Attendees)
                               // .ThenInclude(u => u.AppUser)
+                              .Where(d => d.Date >= request.Params.StartDate)
                               .OrderBy(d => d.Date)
                               .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider,
                                   new{currentUsername = _userAccessor.GetUsername()})
                               .AsQueryable();
                                // .ToListAsync(cancellationToken);
+
+            // Activity that I am going only
+            if(request.Params.IsGoing && !request.Params.IsHost)
+            {
+              query = query
+                .Where(x => x.HostUsername != _userAccessor.GetUsername())
+                .Where(x => x.Attendees.Any(a => a.Username == _userAccessor.GetUsername()));
+            }
+
+            // Activity that I am hosting only
+            if(request.Params.IsHost && !request.Params.IsGoing)
+            {
+               query = query.Where(x => x.HostUsername == _userAccessor.GetUsername());
+            }
             
             // var activitiesToReturn = _mapper.Map<List<ActivityDto>>(Activities);
             // return Result<List<ActivityDto>>.Success(activitiesToReturn);

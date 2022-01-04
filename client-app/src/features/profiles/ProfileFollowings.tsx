@@ -3,12 +3,11 @@ import {Tab, Grid, Header, Card} from "semantic-ui-react";
 import ProfileCard from "./ProfileCard";
 import {useStore} from "../../app/stores/store";
 import { observer } from 'mobx-react-lite';
-import { toJS } from 'mobx';
+
 
 export default observer(function ProfileFollowings() {
     const {profileStore} = useStore();
     const {profile, followings, loadingFollowings, activeTab} = profileStore;
-    console.log(toJS(followings));
 
     return (
         <Tab.Pane loading={loadingFollowings}>
